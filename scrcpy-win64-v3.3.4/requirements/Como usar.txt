@@ -1,0 +1,39 @@
+PASSO A PASSO (WINDOWS)
+
+1) Preparar o celular
+   - Ative as "Opcoes do desenvolvedor"
+   - Ative "Depuracao USB"
+   - Conecte o celular no PC via cabo USB
+   - Desbloqueie a tela e aceite a permissao de depuracao quando aparecer
+
+2) Abrir o PowerShell na pasta do projeto
+   - Abra o PowerShell
+   - Execute:
+
+     cd "C:\Users\Administrator\Desktop\Compartilhamento de tela\scrcpy-win64-v3.3.4"
+
+3) Instalar as requisicoes Python (requirements.txt)
+   - Atualize o pip:
+
+     python -m pip install --upgrade pip
+
+   - Instale as bibliotecas do arquivo requirements.txt:
+
+     python -m pip install -r .\requirements\requirements.txt
+
+4) Rodar o espelhamento (USB)
+   - Execute:
+
+     python .\espelhar_tela.py
+
+   - Se aparecer "Nenhum celular detectado":
+     - confirme o cabo USB
+     - confirme "Depuracao USB" ativa
+     - aceite a permissao no celular
+
+OPCAO (instalador automatico)
+
+Se quiser usar o instalador para baixar ferramentas e rodar o scrcpy automaticamente:
+
+  cd "C:\Users\Administrator\Desktop\Compartilhamento de tela\scrcpy-win64-v3.3.4"
+  python .\requirements\instalador.py
