@@ -435,29 +435,44 @@ def ensure_connected_device():
     """Garante que existe um dispositivo ADB online via cabo (USB) antes de iniciar o scrcpy."""
     if not os.path.exists(ADB_PATH):
         print("❌ Erro: 'adb.exe' não foi encontrado na mesma pasta do script.")
-        return False
+        return None
 
     if not os.path.exists(SCRCPY_PATH):
         print("❌ Erro: 'scrcpy.exe' não foi encontrado na mesma pasta do script.")
-        return False
+        return None
 
     devices = _list_online_devices()
-    if devices:
-        print("✅ Celular detectado! Inicializando a tela...")
-        return True
+    if not devices:
+        print("❌ Nenhum celular detectado.")
+        print("Verifique se:")
+        print(" 1. O cabo USB está conectado.")
+        print(" 2. A 'Depuração USB' está ativada no celular.")
+        print(" 3. A tela do celular está desbloqueada e você aceitou a permissão do PC.")
+        return None
 
-    print("❌ Nenhum celular detectado.")
-    print("Verifique se:")
-    print(" 1. O cabo USB está conectado.")
-    print(" 2. A 'Depuração USB' está ativada no celular.")
-    print(" 3. A tela do celular está desbloqueada e você aceitou a permissão do PC.")
-    return False
+    if len(devices) == 1:
+        device = devices[0]
+        print(f"✅ Celular detectado: {device}. Inicializando a tela...")
+        return device
 
-def start_screen_mirror():
+    # Multiple devices, prefer USB
+    usb_devices = [d for d in devices if ':' not in d]
+    if usb_devices:
+        device = usb_devices[0]
+        print(f"✅ Múltiplos dispositivos detectados. Usando USB: {device}. Inicializando a tela...")
+        return device
+
+    print("❌ Múltiplos dispositivos detectados, mas nenhum USB. Dispositivos:")
+    for d in devices:
+        print(f"  - {d}")
+    print("Conecte apenas um dispositivo USB ou especifique manualmente.")
+    return None
+
+def start_screen_mirror(device):
     """Abre a tela do celular no PC usando o scrcpy."""
     try:
         process = subprocess.Popen(
-            [SCRCPY_PATH, '--stay-awake'],
+            [SCRCPY_PATH, '-s', device, '--stay-awake'],
             creationflags=CREATE_NO_WINDOW
         )
         
@@ -476,6 +491,7 @@ if __name__ == "__main__":
     print("  INICIALIZADOR DE TELA - WINDOWS 10  ")
     print("=" * 40)
     
-    if ensure_connected_device():
-        time.sleep(1) # Pausa rápida
-        start_screen_mirror()
+    device = ensure_connected_device()
+    if device:
+        time.sleep(1)  # Pausa rápida
+        start_screen_mirror(device)
